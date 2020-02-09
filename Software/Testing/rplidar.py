@@ -1,5 +1,7 @@
 import os
 import math
+import json
+import time
 from adafruit_rplidar import RPLidar
 
 #setup lidar
@@ -12,6 +14,7 @@ max_distance = 0;
 def process_data(data):
     global max_distance
     #lcd.fill((0,0,0))
+    points = []
     for angle in range(360):
         distance = data[angle]
         if distance > 0:                  # ignore initially ungathered data points
@@ -21,7 +24,9 @@ def process_data(data):
             y = distance * math.sin(radians)
             point = (160 + int(x / max_distance * 119), 120 + int(y / max_distance * 119))
             #print("point: " + str(point))
- 
+            points.append(point)
+    with open('data2.txt','w') as outfile:
+        outfile.write(str(points)) 
  
 scan_data = [0]*360
  
@@ -32,6 +37,9 @@ try:
             scan_data[min([359, math.floor(angle)])] = distance
         process_data(scan_data)
         print("scan: " +str(scan_data))
+        with open('data1.txt', 'w') as outfile:
+            outfile.write(str(scan_data))
+        time.sleep(10)
  
 except KeyboardInterrupt:
     print('Stoping.')
